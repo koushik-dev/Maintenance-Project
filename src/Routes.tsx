@@ -1,8 +1,30 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Home } from "./pages";
+import App from "./App";
+import { ErrorPage, Home, Login, Register } from "./pages";
+import PrivateRoute from "./PrivateRoute";
 
-const routes = createBrowserRouter([{ path: "/", element: <Home /> }]);
+const routes = createBrowserRouter([
+  {
+    path: "/",
+    element: <PrivateRoute />,
+    errorElement: <ErrorPage />,
+    children: [
+      { path: "/", element: <Home />, errorElement: <ErrorPage /> },
+      { path: "/home", element: <App /> },
+    ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+    errorElement: <ErrorPage />,
+  },
+]);
 
 const Routes = () => {
   return <RouterProvider router={routes} />;
