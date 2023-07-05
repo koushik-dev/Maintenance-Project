@@ -20,7 +20,7 @@ const routes = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: "/register",
+    path: "/unauthorised",
     element: <Register />,
     errorElement: <ErrorPage />,
   },

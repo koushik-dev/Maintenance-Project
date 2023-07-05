@@ -1,25 +1,20 @@
 export enum Actions {
   EXPENSES = "expenses",
   ADD_USER = "add_user",
+  DELETE_USER = "delete_user",
 }
 
 export const defaultState = {
-  user: {
-    name: "John Doe",
-    loggedIn: false,
-  },
+  user: {},
 };
 
 export type IState = {
-  user: {
-    name: string;
-    loggedIn: boolean;
-  };
+  user: any;
 };
 
 export type IAction = {
   type: Actions;
-  payload: Partial<IState>;
+  payload?: any;
 };
 
 export type IContext = [IState, React.Dispatch<IAction>];

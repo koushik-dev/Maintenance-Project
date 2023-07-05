@@ -4,7 +4,15 @@ import { Actions, defaultState, IAction, IContext, IState } from "./model";
 const reducer: Reducer<IState, IAction> = (state, action) => {
   switch (action.type) {
     case Actions.ADD_USER:
-      return { ...state, user: { ...state.user, ...action.payload } };
+      return {
+        ...state,
+        user: { ...state.user, ...(action.payload as IState["user"]) },
+      };
+    case Actions.DELETE_USER:
+      return {
+        ...state,
+        user: {},
+      };
     default:
       return state;
   }

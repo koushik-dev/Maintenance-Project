@@ -1,18 +1,31 @@
-import React, { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AppContext } from "../Providers";
+import { logIn } from "../firebase";
+import { UserCredential } from "firebase/auth";
+import { useAuth } from "../hooks";
 
 const Login = () => {
-  const [state] = useContext(AppContext);
   const navigate = useNavigate();
+  const { isAuthenticated, setUser, user } = useAuth();
 
   useEffect(() => {
-    if (state.user.loggedIn) {
-      return navigate("/");
-    }
-  }, [state.user.loggedIn]);
+    if (isAuthenticated) navigate("/");
+  }, [isAuthenticated]);
 
-  return <div>Login</div>;
+  const login = () => {
+    logIn("admin", "Admin@123").then((resp) => {
+      setUser((resp as UserCredential)?.user);
+      // TODO: post the signedin time to users collection
+      navigate("/");
+    });
+  };
+
+  return (
+    <button onClick={login}>
+      Login
+      {user?.uid}
+    </button>
+  );
 };
 
 export default Login;
