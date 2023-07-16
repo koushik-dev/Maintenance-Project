@@ -1,7 +1,13 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import App from "./App";
-import { ErrorPage, Home, Login, Register } from "./pages";
+import {
+  ErrorPage,
+  Expenses,
+  Home,
+  Login,
+  MonthlyBalanceSheet,
+  Receipt,
+} from "./pages";
 import PrivateRoute from "./PrivateRoute";
 
 const routes = createBrowserRouter([
@@ -10,18 +16,15 @@ const routes = createBrowserRouter([
     element: <PrivateRoute />,
     errorElement: <ErrorPage />,
     children: [
-      { path: "/", element: <Home />, errorElement: <ErrorPage /> },
-      { path: "/home", element: <App /> },
+      { path: "/", element: <Home /> },
+      { path: "/expenses", element: <Expenses /> },
+      { path: "/bsmonthly", element: <MonthlyBalanceSheet /> },
+      { path: "/receipt", element: <Receipt /> },
     ],
   },
   {
     path: "/login",
     element: <Login />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/unauthorised",
-    element: <Register />,
     errorElement: <ErrorPage />,
   },
 ]);

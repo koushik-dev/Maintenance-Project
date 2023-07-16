@@ -14,8 +14,9 @@ const Login = () => {
 
   const login = () => {
     logIn("admin", "Admin@123").then((resp) => {
-      setUser((resp as UserCredential)?.user);
-      // TODO: post the signedin time to users collection
+      setUser({
+        ...(resp as UserCredential)?.user,
+      });
       navigate("/");
     });
   };

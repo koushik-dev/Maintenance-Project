@@ -1,4 +1,6 @@
 export { Header } from "./Header";
-export { SideBar } from "./SideBar";
+export { Sidebar } from "./SideBar";
 export { Modal } from "./Modal";
 export { Layout } from "./Layout";
+export { Loader } from "./Loader";
+export { TimeRange } from "./TimeRange";

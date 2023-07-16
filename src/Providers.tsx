@@ -13,13 +13,17 @@ const reducer: Reducer<IState, IAction> = (state, action) => {
         ...state,
         user: {},
       };
+    case Actions.MONTHLY_EXPENSES:
+      return { ...state, months: { ...state.months, ...action.payload } };
+    case Actions.SIDEBAR:
+      return { ...state, isSideBarOpen: !state.isSideBarOpen };
     default:
       return state;
   }
 };
 
-export const AppContext = createContext([] as unknown as IContext);
-
+const AppContext = createContext([] as unknown as IContext);
+export const useStore = () => React.useContext(AppContext);
 const Providers: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const state = useReducer<Reducer<IState, IAction>>(reducer, defaultState);
 
