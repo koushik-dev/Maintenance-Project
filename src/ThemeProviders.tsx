@@ -17,9 +17,10 @@ const theme = createTheme({
               },
             }),
           ...(ownerState.variant === "outlined" &&
-            ownerState.color === "primary" && {
-              borderColor: "#8757d1",
-              color: "#8757d1",
+            ownerState.color === "primary" &&
+            {
+              // borderColor: "#8757d1",
+              // color: "#8757d1",
             }),
         }),
       },

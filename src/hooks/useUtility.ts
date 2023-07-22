@@ -19,6 +19,8 @@ export const useUtility = () => {
       .split(" ")
       .map((w) => capitalize(w))
       .join(" ") + " only";
+  const getMonthStr = (month: number) =>
+    new Date(1, month).toLocaleString("en-US", { month: "long" });
   return {
     random4,
     map,
@@ -29,5 +31,6 @@ export const useUtility = () => {
     isPositive,
     getIconFromTypes,
     getWordsFromNum,
+    getMonthStr,
   };
 };

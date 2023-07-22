@@ -1,5 +1,5 @@
-import { addDocumentWithID, signUp } from "../firebase";
-import { readDocument, updateDocument } from "../firebase";
+import { addDocumentWithID, readAllDocuments, signUp } from "../firebase";
+import { updateDocument } from "../firebase";
 import { toast } from "react-hot-toast";
 import { Errors, UsersCollectionName } from "../MetaData";
 
@@ -34,8 +34,8 @@ export const createUserforSignIn = (username: string, password: string) =>
       throw err;
     });
 
-export const getUser = (docId: string) => {
-  return readDocument(UsersCollectionName, docId);
+export const getUsers = () => {
+  return readAllDocuments(UsersCollectionName);
 };
 
 export const updateUser = (docId: string, data: any) => {

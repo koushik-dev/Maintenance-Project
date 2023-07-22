@@ -14,16 +14,14 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React from "react";
-import { useStore } from "../Providers";
 import { useReactToPrint } from "react-to-print";
 import { Print } from "@mui/icons-material";
 import { TimeRange } from "../components";
 import { useSearchParams } from "react-router-dom";
 
 const Receipt = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const matches = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
-  const [state] = useStore();
   const [activeMonth, setActiveMonth] = React.useState(
     searchParams.get("month") || new Date().getMonth() + 1
   );
@@ -101,7 +99,7 @@ const Receipt = () => {
                     align: "center",
                     value: "Monthly Standard Maintenance",
                   },
-                  { key: "payment", align: "center", value: "1500" },
+                  { key: "payment", align: "center", value: "2700" },
                 ].map((e) => (
                   <TableCell key={e.key} align={e.align as any}>
                     <Typography variant="body1" fontWeight={500}>
@@ -115,7 +113,7 @@ const Receipt = () => {
                 <TableCell></TableCell>
                 <TableCell align={"center"}>
                   <Typography variant="h6" fontWeight={500}>
-                    1500
+                    2700
                   </Typography>
                 </TableCell>
               </TableRow>

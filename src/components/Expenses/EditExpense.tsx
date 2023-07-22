@@ -23,13 +23,13 @@ import { Loader, Modal } from "..";
 import { Expenses } from "../../MetaData";
 import { editExpenses } from "../../api";
 import { toast } from "react-hot-toast";
-import { useUtility } from "../../hooks";
+import { useCalculate, useUtility } from "../../hooks";
 
 export const EditExpense: React.FC<
   DialogProps & { onClose: () => void; month: string; exId: number }
 > = ({ exId, month, open, onClose }) => {
   const [loading, setLoading] = React.useState(false);
-  const [state, dispatch] = useStore();
+  const [, dispatch] = useStore();
   const {
     filter,
     map,
@@ -37,6 +37,7 @@ export const EditExpense: React.FC<
     getTimestampFromDate,
     capitalize,
   } = useUtility();
+  const { monthlyData, calculateClosingBalance } = useCalculate();
   const {
     register,
     handleSubmit,
@@ -56,7 +57,7 @@ export const EditExpense: React.FC<
 
   const onSubmit = (formValues: any) => {
     setLoading(true);
-    const updatedExpenses = map(state.months[month].expenses, (e) =>
+    const updatedExpenses = map(monthlyData[month].expenses, (e) =>
       e.id === exId
         ? {
             ...formValues,
@@ -66,24 +67,35 @@ export const EditExpense: React.FC<
           }
         : e
     );
-    editExpenses(updatedExpenses)
+    const result = {
+      opening_balance: monthlyData[month]?.opening_balance,
+      expenses: updatedExpenses,
+      closing_balance: calculateClosingBalance(
+        updatedExpenses,
+        monthlyData[month]?.opening_balance
+      ),
+    };
+    editExpenses(result)
       .then(() => {
         toast.success(Expenses.edit_expense_success);
         dispatch({
           type: Actions.MONTHLY_EXPENSES,
-          payload: { [month]: { expenses: updatedExpenses } },
+          payload: { [month]: result },
         });
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        toast.error(Expenses.edit_expense_error);
+        console.log(err);
+      })
       .finally(() => setLoading(false));
     onClose?.();
   };
   const hasError = (id: string) => Object.keys(errors).includes(id);
   React.useEffect(() => {
     setLoading(true);
-    if (state.months[month]) {
+    if (monthlyData[month]) {
       const filteredExpense = filter(
-        state.months[month].expenses,
+        monthlyData[month].expenses,
         (e) => e.id === exId
       )[0];
       reset({
@@ -94,7 +106,7 @@ export const EditExpense: React.FC<
       });
       setLoading(false);
     }
-  }, [state.months]);
+  }, [monthlyData]);
   return (
     <Modal title={Expenses.edit_expense} {...{ open, onClose }}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -105,7 +117,7 @@ export const EditExpense: React.FC<
               control={control}
               name="expense"
               rules={{ required: true }}
-              render={({ field: { onChange, value, ref } }) => (
+              render={({ field: { onChange, value } }) => (
                 <FormControl sx={{ minWidth: 120, flex: 2 }}>
                   <InputLabel id="Expense-label">Expense*</InputLabel>
                   <Select
@@ -141,7 +153,7 @@ export const EditExpense: React.FC<
                       : 0.5,
                   }}
                   freeSolo
-                  onChange={(event, data) => onChange(data || "")}
+                  onChange={(_, data) => onChange(data || "")}
                   value={value || ""}
                   ref={ref}
                   options={Expenses.reason_types.map((option) => option)}

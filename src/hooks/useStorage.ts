@@ -1,5 +1,3 @@
-import React from "react";
-
 export const useStorage = (key: string) => {
   const setSession = (user: any) =>
     localStorage.setItem(key, JSON.stringify(user));

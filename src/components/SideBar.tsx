@@ -60,7 +60,7 @@ const Drawer = styled(MuiDrawer, {
 
 const generateIcon = (variation: keyof typeof MuiIcon, props = {}) => {
   const IconName = MuiIcon[variation];
-  return <IconName {...props} />;
+  return IconName ? <IconName {...props} /> : <>...</>;
 };
 
 export const Sidebar: React.FC = () => {

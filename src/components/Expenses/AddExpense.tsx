@@ -23,14 +23,13 @@ import { Loader, Modal } from "..";
 import { Expenses } from "../../MetaData";
 import { addExpense } from "../../api";
 import { toast } from "react-hot-toast";
-import { useUtility } from "../../hooks";
+import { useCalculate, useUtility } from "../../hooks";
 
-export const AddExpense: React.FC<DialogProps & { onClose: () => void }> = ({
-  open,
-  onClose,
-}) => {
+export const AddExpense: React.FC<
+  DialogProps & { onClose: () => void; activeMonth: string | number }
+> = ({ open, onClose, activeMonth }) => {
   const [loading, setLoading] = React.useState(false);
-  const [state, dispatch] = useStore();
+  const [, dispatch] = useStore();
   const { random4, getTimestampFromDate, capitalize } = useUtility();
   const {
     register,
@@ -40,43 +39,50 @@ export const AddExpense: React.FC<DialogProps & { onClose: () => void }> = ({
     watch,
   } = useForm({
     defaultValues: {
-      date: new Date().toISOString().split("T")[0],
+      date: new Date(new Date().getFullYear(), +activeMonth - 1, 2)
+        .toISOString()
+        .split("T")[0],
       expense: "",
       reason: "",
       amount: "",
       transaction: Expenses.credit,
     },
   });
+  const { monthlyData, calculateClosingBalance } = useCalculate();
 
   const onSubmit = (formValues: any) => {
     setLoading(true);
     const newExpense = {
       ...formValues,
-      date: new Date(formValues.date),
+      date: getTimestampFromDate(new Date(formValues.date)),
       amount: +formValues.amount,
       updatedOn: new Date(),
       id: random4(),
     };
-    addExpense(newExpense)
+    const month = new Date(formValues.date).getMonth() + 1;
+    const result = {
+      opening_balance: monthlyData[month - 1]?.closing_balance || 0,
+      expenses: [...(monthlyData[month]?.expenses || []), newExpense],
+      closing_balance: calculateClosingBalance(
+        [...(monthlyData[month]?.expenses || []), newExpense],
+        monthlyData[month - 1]?.closing_balance || 0
+      ),
+    };
+    addExpense(result)
       .then((_) => {
         const month = new Date(formValues.date).getMonth() + 1;
         toast.success(Expenses.add_expense_success);
         dispatch({
           type: Actions.MONTHLY_EXPENSES,
           payload: {
-            [month]: {
-              expenses: [
-                ...state.months[month].expenses,
-                {
-                  ...newExpense,
-                  date: getTimestampFromDate(new Date(formValues.date)),
-                },
-              ],
-            },
+            [month]: result,
           },
         });
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        toast.error(Expenses.add_expense_error);
+        console.log(err);
+      })
       .finally(() => setLoading(false));
 
     onClose?.();
@@ -93,7 +99,7 @@ export const AddExpense: React.FC<DialogProps & { onClose: () => void }> = ({
               control={control}
               name="expense"
               rules={{ required: true }}
-              render={({ field: { onChange, value, ref } }) => (
+              render={({ field: { onChange, value } }) => (
                 <FormControl sx={{ minWidth: 120, flex: 2 }}>
                   <InputLabel id="Expense-label">Expense*</InputLabel>
                   <Select

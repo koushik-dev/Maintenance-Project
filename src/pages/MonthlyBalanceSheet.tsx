@@ -16,6 +16,7 @@ import { useStore } from "../Providers";
 import { useReactToPrint } from "react-to-print";
 import { Print } from "@mui/icons-material";
 import { useSearchParams } from "react-router-dom";
+import { TExpense } from "../model";
 
 const MonthlyBalanceSheet = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,45 +24,31 @@ const MonthlyBalanceSheet = () => {
   const printRef = React.useRef(null);
   const handlePrint = useReactToPrint({ content: () => printRef.current });
   const [state] = useStore();
-  const { calculate } = useCalculate();
-  const { isPositive, getWordsFromNum } = useUtility();
-  const [total, setTotal] = React.useState(0);
+  const { calculateTotal, monthlyData } = useCalculate();
+  const { isPositive, getWordsFromNum, getMonthStr } = useUtility();
+  const [{ total, debit, credit }, setTotal] = React.useState({
+    credit: 0,
+    debit: 0,
+    total: 0,
+  });
   const [loading, setLoading] = React.useState(true);
   const [activeMonth, setActiveMonth] = React.useState(
     searchParams.get("month") || new Date().getMonth() + 1
   );
-  const [expensesData, setExpensesData] = React.useState<
-    Record<string, { amount: number; categories: string[] }>
-  >({});
+  const [expensesData, setExpensesData] = React.useState<TExpense[]>([]);
 
   React.useMemo(() => {
-    if (state.months[activeMonth]) {
-      const clubExpenses = () =>
-        state.months[activeMonth]?.expenses.reduce(
-          (acc, ex) => ({
-            ...acc,
-            [ex.expense]: {
-              ...acc[ex.expense],
-              amount:
-                (acc[ex.expense]?.amount || 0) +
-                (ex.transaction === Expenses.credit ? ex.amount : -ex.amount),
-              categories: [
-                ...(acc[ex.expense]?.categories || []),
-                ex.reason,
-              ].filter((v) => !!v),
-            },
-          }),
-          {} as Record<string, { amount: number; categories: string[] }>
-        );
-      setExpensesData(clubExpenses());
-    }
+    if (state.months[activeMonth])
+      setExpensesData(state.months[activeMonth].expenses);
   }, [state, activeMonth]);
 
   React.useEffect(() => {
-    setLoading(!state.months[activeMonth]);
-  }, [state, activeMonth]);
+    setLoading(!Object.keys(state.months).length);
+  }, [state]);
   React.useEffect(() => {
-    if (!loading) setTotal(calculate(activeMonth));
+    if (!loading && state.months[activeMonth])
+      setTotal(calculateTotal(activeMonth));
+    if (!state.months[activeMonth]) setTotal({ credit: 0, debit: 0, total: 0 });
   }, [loading, activeMonth]);
   return (
     <>
@@ -70,7 +57,10 @@ const MonthlyBalanceSheet = () => {
         <Box display={"flex"} gap={2}>
           <TimeRange
             value={activeMonth}
-            onChange={(e) => setActiveMonth(+e.target.value)}
+            onChange={(e) => {
+              setActiveMonth(+e.target.value);
+              setSearchParams({ month: e.target.value });
+            }}
             duration="month"
           />
           <IconButton onClick={handlePrint}>
@@ -80,13 +70,13 @@ const MonthlyBalanceSheet = () => {
       </Stack>
       <Stack p={matches ? 3 : 1} ref={printRef}>
         <Stack alignItems={"center"}>
-          <img
+          {/* <img
             src="https://images.pexels.com/photos/2077937/pexels-photo-2077937.jpeg"
             alt="apartment"
             className="w-32"
-          />
-          <Typography variant="h6" textAlign={"center"}>
-            {MonthlyInvoice.address1}
+          /> */}
+          <Typography variant="h5" textAlign={"center"}>
+            {MonthlyInvoice.association}
           </Typography>
           <Typography variant="body1">{MonthlyInvoice.address2}</Typography>
           <Typography variant="body1">{MonthlyInvoice.city}</Typography>
@@ -98,83 +88,148 @@ const MonthlyBalanceSheet = () => {
             <Divider variant="middle" />
             <Typography variant="overline">PAN Number: PSENC00000</Typography>
           </Stack>
+          <Typography variant="h6" textAlign={"center"}>
+            {getMonthStr(+activeMonth - 1)} Month Balance Sheet
+          </Typography>
         </Stack>
-        <Divider
-          sx={{
-            my: 2,
-            borderBottomWidth: 4,
-            borderColor: (theme) => theme.palette.common.black,
-          }}
-        />
-        {loading ? (
-          <Loader />
-        ) : !state.months[activeMonth]?.expenses.length ? (
-          <p>No Expenses!</p>
-        ) : (
-          Object.keys(expensesData)?.map((ex, index, arr) => (
-            <React.Fragment key={ex}>
-              <Stack
-                direction={"row"}
-                alignItems="center"
-                justifyContent={"space-between"}
-              >
-                <Stack>
-                  <Typography variant="body1">{ex}</Typography>
-                  <Typography variant="caption">
-                    {expensesData[ex].categories.length > 0
-                      ? expensesData[ex].categories.join(", ")
-                      : ""}
-                  </Typography>
-                </Stack>
-                <Typography
-                  variant="body1"
-                  color={
-                    isPositive(expensesData[ex].amount)
-                      ? "success.main"
-                      : "error.main"
-                  }
-                >
-                  {expensesData[ex].amount}
-                </Typography>
-              </Stack>
-              {index !== arr.length - 1 ? (
-                <Divider sx={{ width: "80%", ml: "auto", my: 2 }} />
-              ) : null}
-            </React.Fragment>
-          ))
-        )}
-        <Divider
-          sx={{
-            my: 2,
-            borderBottomWidth: 4,
-            borderColor: (theme) => theme.palette.common.black,
-          }}
-        />
+        <Stack direction={"row"} gap={4}>
+          <Box flex={1}>
+            <Divider
+              sx={{
+                mb: 1,
+                borderBottomWidth: 4,
+                borderColor: (theme) => theme.palette.common.black,
+              }}
+            />
+            {loading ? (
+              <Loader />
+            ) : !state.months[activeMonth]?.expenses?.length ? (
+              <p>No Expenses!</p>
+            ) : (
+              expensesData?.map((ex, index, arr) => (
+                <React.Fragment key={ex.id}>
+                  <Stack
+                    direction={"row"}
+                    alignItems="center"
+                    justifyContent={"space-between"}
+                  >
+                    <Stack>
+                      <Typography variant="body1">{ex.expense}</Typography>
+                      <Typography variant="caption">{ex.reason}</Typography>
+                    </Stack>
+                    <Typography
+                      variant="body1"
+                      color={
+                        ex.transaction === Expenses.credit
+                          ? "success.main"
+                          : "error.main"
+                      }
+                    >
+                      {ex.transaction === Expenses.credit ? "" : "-"}
+                      {ex.amount}
+                    </Typography>
+                  </Stack>
+                  {index !== arr.length - 1 ? (
+                    <Divider sx={{ width: "80%", ml: "auto", my: 2 }} />
+                  ) : null}
+                </React.Fragment>
+              ))
+            )}
+            <Divider
+              sx={{
+                my: 1,
+                borderBottomWidth: 4,
+                borderColor: (theme) => theme.palette.common.black,
+              }}
+            />
+          </Box>
+        </Stack>
         <Stack direction={"row"} justifyContent="right" gap={4}>
-          <Typography variant="h6">{MonthlyInvoice.totalAmount}</Typography>
-          <Typography
-            variant="h6"
-            color={isPositive(total) ? "success.main" : "error.main"}
-          >
-            {total}
-          </Typography>
+          <Box>
+            <Typography variant="body1">
+              {MonthlyInvoice.totalCredits}
+            </Typography>
+            <Typography
+              variant="h6"
+              fontWeight={400}
+              color={"success.main"}
+              textAlign="center"
+            >
+              {credit}
+            </Typography>
+          </Box>
+          <Box>
+            <Typography variant="body1">
+              {MonthlyInvoice.totalDebits}
+            </Typography>
+            <Typography
+              variant="h6"
+              fontWeight={400}
+              color={"error.main"}
+              textAlign="center"
+            >
+              {debit}
+            </Typography>
+          </Box>
+          <Box>
+            <Typography variant="body1">
+              {MonthlyInvoice.totalAmount}
+            </Typography>
+            <Typography
+              variant="h6"
+              color={isPositive(total) ? "success.main" : "error.main"}
+              textAlign="center"
+            >
+              {total}
+            </Typography>
+          </Box>
         </Stack>
-        {MonthlyInvoice.amountInWords}
-        <Typography variant="body1" fontWeight={500}>
-          {getWordsFromNum(total)}
-        </Typography>
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          {MonthlyInvoice.note}
-        </Typography>
-        {MonthlyInvoice.notes.map((r, index) => (
-          <Typography variant="body1" key={r.text}>
-            {index + 1} . {r.text}
-          </Typography>
-        ))}
-        <Stack direction={"row"} my={3} justifyContent="space-between">
+        <Stack
+          direction={"row"}
+          justifyContent={"space-between"}
+          alignItems="center"
+        >
+          <Stack gap={1} className="p-2 my-2">
+            <Box
+              display={"flex"}
+              justifyContent="space-between"
+              alignItems={"center"}
+              gap={2}
+            >
+              <Typography variant="body1">Opening Balance: </Typography>
+              <Typography variant="body1" fontWeight={500} color="success.main">
+                {monthlyData[activeMonth]?.opening_balance}
+              </Typography>
+            </Box>
+            <Box
+              display={"flex"}
+              justifyContent="space-between"
+              alignItems={"center"}
+              gap={2}
+            >
+              <Typography variant="body1">Closing Balance: </Typography>
+              <Typography variant="body1" fontWeight={500} color="success.main">
+                {monthlyData[activeMonth]?.closing_balance}
+              </Typography>
+            </Box>
+          </Stack>
+          <Box>
+            <Typography variant="body2" textAlign={"right"}>
+              {MonthlyInvoice.amountInWords}
+            </Typography>
+            <Typography variant="body1" fontWeight={500} textAlign={"right"}>
+              {getWordsFromNum(total)}
+            </Typography>
+          </Box>
+        </Stack>
+
+        {/* Signature */}
+        <Stack direction={"row"} justifyContent="space-between">
           <Box></Box>
           <Box>
-            <Typography variant="h5">Casagrand Association</Typography>
+            <Typography variant="h6" fontWeight={500} textAlign={"right"}>
+              {MonthlyInvoice.association}
+            </Typography>
             <img
               style={{ width: "200px", marginLeft: "auto" }}
               src="https://static.cdn.wisestamp.com/wp-content/uploads/2020/08/Oprah-Winfrey-Signature-1.png"

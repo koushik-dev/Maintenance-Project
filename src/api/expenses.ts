@@ -1,22 +1,23 @@
 import { readDocument, updateDocument } from "../firebase";
-import { arrayUnion, Timestamp } from "firebase/firestore";
-import { TExpense } from "../model";
+import { Timestamp } from "firebase/firestore";
+import { TMonth } from "../model";
 
 const docId = "22-23";
 
 export const getAllExpenses = () => readDocument("maintenance", docId);
-export const addExpense = (expense: TExpense) =>
+
+export const updateExpenses = (month: string, monthDetails: TMonth) =>
   updateDocument("maintenance", docId, {
-    [`months.${expense.date.getMonth() + 1}.expenses`]: arrayUnion(expense),
+    [`months.${month}`]: monthDetails,
   });
-export const updateExpenses = (month: string, expenses: TExpense[] = []) =>
-  updateDocument("maintenance", docId, {
-    [`months.${month}.expenses`]: expenses,
-  });
-export const editExpenses = (expenses: TExpense[]) =>
+export const editExpenses = (monthDetails: TMonth) =>
   updateExpenses(
     (
-      (expenses[0].date as unknown as Timestamp).toDate()?.getMonth() + 1
+      (monthDetails.expenses[0].date as unknown as Timestamp)
+        .toDate()
+        ?.getMonth() + 1
     ).toString(),
-    expenses
+    monthDetails
   );
+
+export const addExpense = editExpenses;
