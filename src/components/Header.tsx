@@ -77,7 +77,9 @@ export const Header = () => {
             onClick={handleMenu}
           >
             {matches ? isAdmin ? <AdminPanelSettings /> : <Person /> : null}
-            <Typography variant="body2">{state.activeUser.name}</Typography>
+            <Typography variant="body2">
+              {isAdmin ? "Admin" : state.activeUser?.name}
+            </Typography>
           </Button>
         </Toolbar>
       </AppBar>

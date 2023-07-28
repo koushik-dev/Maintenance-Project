@@ -11,7 +11,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [loading, setLoading] = React.useState(false);
   const [, dispatch] = useStore();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const matches = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
       .then((users) =>
         dispatch({
           type: Actions.SET_USER,
-          payload: { users, userId: user.uid },
+          payload: { users, userId: isAdmin ? "" : user.uid },
         })
       )
       .then(() => setLoading(false))

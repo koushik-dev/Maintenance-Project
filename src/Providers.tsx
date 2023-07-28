@@ -7,9 +7,11 @@ const reducer: Reducer<IState, IAction> = (state, action) => {
       return {
         ...state,
         users: action.payload.users as IState["users"],
-        activeUser: (action.payload.users as IState["users"]).find(
-          (user) => user.docId === action.payload.userId
-        ),
+        activeUser: action.payload.userId
+          ? (action.payload.users as IState["users"]).find(
+              (user) => user.docId === action.payload.userId
+            )
+          : {},
       };
     case Actions.ADD_USER:
       return {
