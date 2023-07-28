@@ -8,9 +8,9 @@ export const Modal: React.FC<
     title: string;
     children: React.ReactNode;
   }
-> = ({ open, onClose, title, children }) => {
+> = ({ open, onClose, title, children, ...props }) => {
   return (
-    <Dialog {...{ open, onClose }} fullWidth>
+    <Dialog {...{ open, onClose, ...props }} fullWidth>
       <DialogTitle>
         {title}
         <IconButton

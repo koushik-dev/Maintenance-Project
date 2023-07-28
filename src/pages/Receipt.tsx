@@ -1,6 +1,7 @@
 import {
   Box,
-  IconButton,
+  Button,
+  Divider,
   Paper,
   Stack,
   Table,
@@ -15,9 +16,9 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useReactToPrint } from "react-to-print";
-import { Print } from "@mui/icons-material";
 import { TimeRange } from "../components";
 import { useSearchParams } from "react-router-dom";
+import { Print } from "@mui/icons-material";
 
 const Receipt = () => {
   const [searchParams] = useSearchParams();
@@ -29,19 +30,26 @@ const Receipt = () => {
   const handlePrint = useReactToPrint({ content: () => printRef.current });
   return (
     <>
-      <Stack direction={"row"} justifyContent="space-between" pt={3} pr={3}>
-        <Box></Box>
+      <Stack
+        direction={"row"}
+        justifyContent="space-between"
+        p={matches ? 3 : 1}
+      >
+        <Box className="flex gap-2">
+          <Button variant="outlined" onClick={handlePrint}>
+            <Print sx={{ mr: 1 }} />
+            Print
+          </Button>
+        </Box>
         <Box display={"flex"} gap={2}>
           <TimeRange
             value={activeMonth}
             onChange={(e) => setActiveMonth(+e.target.value)}
             duration="month"
           />
-          <IconButton onClick={handlePrint}>
-            <Print />
-          </IconButton>
         </Box>
       </Stack>
+      <Divider variant="middle" />
       <Stack p={matches ? 3 : 1} gap={2} ref={printRef}>
         <Stack direction={"row"} justifyContent="space-between">
           <Stack alignItems={"start"}>

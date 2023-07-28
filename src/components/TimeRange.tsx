@@ -11,7 +11,10 @@ export const TimeRange: React.FC<{
   onChange: (e: SelectChangeEvent) => void;
   duration: "month" | "year";
 }> = ({ value, onChange, duration }) => {
-  const generateTimeline = (duration: "month" | "year") => {
+  const currentMonth = new Date().getMonth();
+  const generateTimeline: (
+    duration: "month" | "year"
+  ) => { id: string; name: string }[] = (duration) => {
     const getMonthStr = (month: number) => {
       const date = new Date(new Date().getFullYear(), month);
       return date.toLocaleString("en-US", { month: "long", year: "numeric" });
@@ -19,7 +22,12 @@ export const TimeRange: React.FC<{
     if (duration === "month")
       return Array(12)
         .fill(0)
-        .map((_, i) => ({ id: i + 4, name: getMonthStr(i + 3) }));
+        .reduce((a, _, i) => {
+          if (i + 3 <= currentMonth) {
+            a.push({ id: i + 4, name: getMonthStr(i + 3) });
+          }
+          return a;
+        }, []);
     else
       return Array(5)
         .fill(new Date().getFullYear())
@@ -29,7 +37,7 @@ export const TimeRange: React.FC<{
         }));
   };
   return (
-    <FormControl sx={{ minWidth: 120, flex: 2 }}>
+    <FormControl sx={{ minWidth: 120 }}>
       <Select size="small" value={value.toString()} onChange={onChange}>
         {generateTimeline(duration).map(({ id, name }) => (
           <MenuItem key={name} value={id}>

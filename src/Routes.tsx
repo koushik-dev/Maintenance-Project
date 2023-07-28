@@ -8,6 +8,7 @@ import {
   Home,
   Login,
   MonthlyBalanceSheet,
+  Myself,
   Receipt,
   Users,
   YearlyBalanceSheet,
@@ -26,6 +27,7 @@ const routes = createBrowserRouter([
       { path: "/bsyearly", element: <YearlyBalanceSheet /> },
       { path: "/receipt", element: <Receipt /> },
       { path: "/users", element: <Users /> },
+      { path: "/myself", element: <Myself /> },
     ],
   },
   {

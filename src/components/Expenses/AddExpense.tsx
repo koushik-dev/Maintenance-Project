@@ -136,7 +136,16 @@ export const AddExpense: React.FC<
                   }}
                   freeSolo
                   onChange={(_, data) => onChange(data || "")}
-                  value={value || ""}
+                  value={
+                    Expenses.expense_types
+                      .reduce(
+                        (a, e) => (e.required ? [...a, e.name] : a),
+                        [] as string[]
+                      )
+                      .includes(watch("expense"))
+                      ? value
+                      : ""
+                  }
                   ref={ref}
                   options={Expenses.reason_types.map((option) => option)}
                   renderInput={(params) => (
@@ -162,12 +171,12 @@ export const AddExpense: React.FC<
             <TextField
               type="number"
               error={hasError("amount")}
-              label={`${Expenses.amount}*`}
+              label={`${Expenses.amount}`}
               {...register("amount", { required: true })}
             />
             <TextField
               type="date"
-              label={`${Expenses.spent_date}*`}
+              label={`${Expenses.spent_date}`}
               {...register("date")}
               required
             />

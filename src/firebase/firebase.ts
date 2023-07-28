@@ -12,9 +12,7 @@ import {
   onMessage,
 } from "firebase/messaging";
 
-import toast from "react-hot-toast";
 import { updateUser } from "../api";
-import { Errors } from "../MetaData";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB9GGwROTtLZSoCawjQa5VAQ2hOm0rClC0",
@@ -43,19 +41,16 @@ export const signUp = (username: string, password: string) =>
   createUserWithEmailAndPassword(auth, username, password);
 
 export const logIn = (username: string, password: string) =>
-  signInWithEmailAndPassword(auth, `${username}@maintenance.com`, password)
-    .then((userCredential) => {
-      updateUser(userCredential.user.uid, {
-        last_login: new Date().toLocaleString(),
-      }).then((_) => console.log(`${username} signed in.`));
-      return userCredential;
-    })
-    .catch((error) => {
-      if (error.code === "auth/user-not-found")
-        toast.error(Errors.USER_NOT_FOUND);
-
-      throw error;
-    });
+  signInWithEmailAndPassword(
+    auth,
+    `${username}@maintenance.com`,
+    password
+  ).then((userCredential) => {
+    updateUser(userCredential.user.uid, {
+      last_login: new Date().toLocaleString(),
+    }).then((_) => console.log(`${username} signed in.`));
+    return userCredential;
+  });
 
 export const logOut = () => signOut(auth).catch((err) => console.error(err));
 export const onMessageListener: () => Promise<MessagePayload> = () =>

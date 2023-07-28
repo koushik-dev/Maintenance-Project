@@ -179,7 +179,6 @@ export const ExpenseTable: React.FC<{
         <Stack gap={1} my={2}>
           {filteredExpenses?.map((ex) => (
             <Card
-              raised
               key={ex.id}
               className="border border-solid border-slate-400 p-2 flex justify-between"
               sx={{ borderRadius: "0.5rem" }}
@@ -194,10 +193,10 @@ export const ExpenseTable: React.FC<{
               }}
             >
               <Stack>
-                <Typography variant="h6" fontWeight={400}>
+                <Typography variant="subtitle2" fontWeight={400}>
                   {ex.reason || ex.expense}
                 </Typography>
-                <Typography variant="body2">
+                <Typography variant="subtitle2">
                   {getDateFromTimestamp(ex.date).toLocaleDateString()}
                 </Typography>
               </Stack>

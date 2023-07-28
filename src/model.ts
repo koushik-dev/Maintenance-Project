@@ -9,11 +9,13 @@ export enum Actions {
 }
 export const defaultState: IState = {
   users: [],
+  activeUser: {},
   months: {},
   isSideBarOpen: false,
 };
 export type IState = {
   users: any[];
+  activeUser: any;
   months: Record<string, TMonth>;
   isSideBarOpen: boolean;
 };

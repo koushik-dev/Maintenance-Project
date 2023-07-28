@@ -11,6 +11,12 @@ export const AppBarTexts = {
   logout: "Log Out",
   admin: "Admin",
 };
+export const Details = {
+  association: "Casagrand The Address Association",
+  address2: "Riverview residency 2nd street",
+  city: "West Mambalam, Chennai.",
+  pincode: "600097",
+};
 export const SideBarTexts = {
   options: [
     {
@@ -37,6 +43,20 @@ export const SideBarTexts = {
       name: "Users",
       route: "/users",
       icon: "Group",
+    },
+  ],
+};
+export const BottomNavigationTexts = {
+  options: [
+    {
+      name: "Home",
+      route: "/",
+      icon: "HomeOutlined",
+    },
+    {
+      name: "Me",
+      route: "/myself",
+      icon: "PersonOutlined",
     },
   ],
 };
@@ -107,15 +127,33 @@ export const Expenses = {
 export const MonthlyInvoice = {
   title: "Invoice",
   note: "Note:",
-  amountInWords: "Amount In Words: ",
+  amountInWords: "Balance Amount In Words: ",
   totalAmount: "Balance",
   totalCredits: "Credits",
   totalDebits: "Debits",
   invoiceNo: "Invoice No: ",
   signMember: "President / Secretary / Treasurer",
   notes: [{ text: "We will accept only cash." }],
-  association: "Casagrand The Address Association",
-  address2: "Riverview residency 2nd street",
-  city: "West Mambalam, Chennai.",
-  pincode: "600097",
+  ...Details,
+};
+export const MyselfTexts = {
+  cards: [
+    {
+      name: "Maintenance Receipts",
+      route: "/receipt",
+    },
+    {
+      name: "All Expenses",
+      route: "/expenses",
+    },
+    {
+      name: "Vehicles",
+      route: "/receipt",
+    },
+    {
+      name: "Complaints",
+      route: "/expenses",
+      disabled: true,
+    },
+  ],
 };

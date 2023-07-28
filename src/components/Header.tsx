@@ -8,7 +8,7 @@ import {
   Menu,
   MenuItem,
   Theme,
-  Box,
+  Button,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -26,8 +26,8 @@ export const Header = () => {
   const navigate = useNavigate();
   const matches = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const { removeUser, isAdmin } = useAuth();
-  const [, dispatch] = useStore();
+  const { logOutUser, isAdmin } = useAuth();
+  const [state, dispatch] = useStore();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -38,7 +38,7 @@ export const Header = () => {
 
   const logUserOut = () => {
     logOut().then(() => {
-      removeUser();
+      logOutUser();
       navigate("/login");
     });
   };
@@ -52,34 +52,33 @@ export const Header = () => {
           zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
       >
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-            onClick={() =>
-              dispatch({
-                type: Actions.SIDEBAR,
-              })
-            }
-          >
-            <MenuIcon />
-          </IconButton>
+        <Toolbar variant={matches ? "regular" : "dense"}>
+          {matches && (
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ mr: 2 }}
+              onClick={() =>
+                dispatch({
+                  type: Actions.SIDEBAR,
+                })
+              }
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {AppBarTexts.title}
           </Typography>
-          <Box display="flex" alignItems="center">
-            {matches ? (
-              <Typography variant="body2">
-                {isAdmin ? AppBarTexts.admin : "user"}
-              </Typography>
-            ) : null}
-            <IconButton sx={{ color: "white" }} onClick={handleMenu}>
-              {isAdmin ? <AdminPanelSettings /> : <Person />}
-            </IconButton>
-          </Box>
+          <Button
+            sx={{ color: "white", gap: 1, textTransform: "capitalize" }}
+            onClick={handleMenu}
+          >
+            {matches ? isAdmin ? <AdminPanelSettings /> : <Person /> : null}
+            <Typography variant="body2">{state.activeUser.name}</Typography>
+          </Button>
         </Toolbar>
       </AppBar>
       <Menu
