@@ -16,6 +16,7 @@ import { Expenses as ExpensesMeta } from "../MetaData";
 import { useCalculate } from "../hooks/useCalculate";
 import { useSearchParams } from "react-router-dom";
 import { ExpenseTable } from "../components/Expenses";
+import { useStore } from "../Providers";
 
 const Expenses = () => {
   const [searchParams] = useSearchParams();
@@ -30,6 +31,7 @@ const Expenses = () => {
   const { isAdmin } = useAuth();
   const { credit, debit, total } = calculateTotal(activeMonth);
   const addClose = () => setAddOpen(false);
+  const [state] = useStore();
 
   return (
     <Stack p={matches ? 3 : 1}>
@@ -56,7 +58,7 @@ const Expenses = () => {
         <Box></Box>
         {isAdmin ? (
           <Button variant="contained" onClick={() => setAddOpen(true)}>
-            {ExpensesMeta.add_expense}
+            + {ExpensesMeta.add_expense}
           </Button>
         ) : null}
       </Box>
@@ -68,11 +70,14 @@ const Expenses = () => {
         sx={{ my: 2 }}
       >
         <Stack>
-          <Typography variant={matches ? "body1" : "subtitle2"}>
+          <Typography
+            variant={matches ? "body1" : "subtitle2"}
+            fontWeight={400}
+          >
             {capitalize(ExpensesMeta.openingBalance)}
           </Typography>
           <Typography variant="h6" color="success.main">
-            {monthlyData[activeMonth]?.opening_balance || 0}
+            {state.closing_balances[+activeMonth - 1] || 0}
           </Typography>
         </Stack>
         {matches ? (
@@ -113,12 +118,13 @@ const Expenses = () => {
         <Stack>
           <Typography
             variant={matches ? "body1" : "subtitle2"}
+            fontWeight={400}
             textAlign={"right"}
           >
             {capitalize(ExpensesMeta.closingBalance)}
           </Typography>
           <Typography variant="h6" color="success.main" textAlign={"right"}>
-            {monthlyData[activeMonth]?.closing_balance || 0}
+            {state.closing_balances[+activeMonth] || 0}
           </Typography>
         </Stack>
       </Box>
@@ -131,7 +137,7 @@ const Expenses = () => {
           mb={2}
         >
           <Box textAlign={"center"}>
-            <Typography variant={"subtitle1"}>
+            <Typography variant={"subtitle1"} fontWeight={300}>
               {capitalize(ExpensesMeta.credit)}
             </Typography>
             <Typography variant="body1" fontWeight={500} color="success.main">
@@ -139,7 +145,7 @@ const Expenses = () => {
             </Typography>
           </Box>
           <Box textAlign={"center"}>
-            <Typography variant={"subtitle1"}>
+            <Typography variant={"subtitle1"} fontWeight={300}>
               {capitalize(ExpensesMeta.debit)}
             </Typography>
             <Typography variant="body1" fontWeight={500} color="error.main">
@@ -147,7 +153,9 @@ const Expenses = () => {
             </Typography>
           </Box>
           <Box textAlign={"center"}>
-            <Typography variant={"subtitle1"}>Final</Typography>
+            <Typography variant={"subtitle1"} fontWeight={300}>
+              Final
+            </Typography>
             <Typography
               variant="body1"
               fontWeight={500}
@@ -175,7 +183,7 @@ const Expenses = () => {
       />
       <ExpenseTable {...{ search, activeMonth, addOpen, addClose }} />
       <Typography textAlign={"right"}>
-        Total: {monthlyData[activeMonth]?.expenses.length || 0}
+        Total: {monthlyData[activeMonth]?.expenses?.length || 0}
       </Typography>
     </Stack>
   );

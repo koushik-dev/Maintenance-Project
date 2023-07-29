@@ -11,9 +11,10 @@ export const defaultState: IState = {
   users: [],
   activeUser: {},
   months: {},
+  closing_balances: {},
   isSideBarOpen: false,
 };
-export type IState = {
+export type IState = TClosingBalance & {
   users: any[];
   activeUser: any;
   months: Record<string, TMonth>;
@@ -56,7 +57,6 @@ export interface IUser {
   };
 }
 export type TMonth = {
-  opening_balance: number;
   expenses: TExpense[];
-  closing_balance: number;
 };
+export type TClosingBalance = { closing_balances: Record<string, number> };

@@ -5,5 +5,6 @@ export { default as Receipt } from "./Receipt";
 export { default as ErrorPage } from "./ErrorPage";
 export { default as Expenses } from "./Expenses";
 export { default as Myself } from "./Myself";
+export { default as Reports } from "./Reports";
 export { default as MonthlyBalanceSheet } from "./MonthlyBalanceSheet";
 export { default as YearlyBalanceSheet } from "./YearlyBalanceSheet";

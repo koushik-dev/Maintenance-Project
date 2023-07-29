@@ -24,7 +24,14 @@ const reducer: Reducer<IState, IAction> = (state, action) => {
         users: [],
       };
     case Actions.MONTHLY_EXPENSES:
-      return { ...state, months: { ...state.months, ...action.payload } };
+      return {
+        ...state,
+        months: { ...state.months, ...action.payload.months },
+        closing_balances: {
+          ...state.closing_balances,
+          ...action.payload.closing_balances,
+        },
+      };
     case Actions.SIDEBAR:
       return { ...state, isSideBarOpen: !state.isSideBarOpen };
     default:

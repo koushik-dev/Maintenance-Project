@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Actions } from "../../model";
+import { Actions, TClosingBalance, TMonth } from "../../model";
 import { useStore } from "../../Providers";
 import { Loader, Modal } from "..";
 import { Expenses } from "../../MetaData";
@@ -60,12 +60,12 @@ export const AddExpense: React.FC<
       id: random4(),
     };
     const month = new Date(formValues.date).getMonth() + 1;
-    const result = {
-      opening_balance: monthlyData[month - 1]?.closing_balance || 0,
+    const result: TMonth & TClosingBalance = {
       expenses: [...(monthlyData[month]?.expenses || []), newExpense],
-      closing_balance: calculateClosingBalance(
-        [...(monthlyData[month]?.expenses || []), newExpense],
-        monthlyData[month - 1]?.closing_balance || 0
+      closing_balances: calculateClosingBalance(
+        +formValues.amount *
+          (formValues.transaction === Expenses.credit ? 1 : -1),
+        new Date(formValues.date).getMonth() + 1
       ),
     };
     addExpense(result)
@@ -75,7 +75,10 @@ export const AddExpense: React.FC<
         dispatch({
           type: Actions.MONTHLY_EXPENSES,
           payload: {
-            [month]: result,
+            months: {
+              [month]: { expenses: result.expenses },
+            },
+            closing_balances: result.closing_balances,
           },
         });
       })

@@ -67,20 +67,30 @@ export const EditExpense: React.FC<
           }
         : e
     );
+    let diff =
+      updatedExpenses.reduce(
+        (value, exp) =>
+          value + exp.amount * (exp.transaction === Expenses.credit ? 1 : -1),
+        0
+      ) -
+      monthlyData[month]?.expenses?.reduce(
+        (value, exp) =>
+          value + exp.amount * (exp.transaction === Expenses.credit ? 1 : -1),
+        0
+      );
     const result = {
-      opening_balance: monthlyData[month]?.opening_balance,
       expenses: updatedExpenses,
-      closing_balance: calculateClosingBalance(
-        updatedExpenses,
-        monthlyData[month]?.opening_balance
-      ),
+      closing_balances: calculateClosingBalance(diff, +month),
     };
     editExpenses(result)
       .then(() => {
         toast.success(Expenses.edit_expense_success);
         dispatch({
           type: Actions.MONTHLY_EXPENSES,
-          payload: { [month]: result },
+          payload: {
+            months: { [month]: { expenses: result.expenses } },
+            ...result,
+          },
         });
       })
       .catch((err) => {

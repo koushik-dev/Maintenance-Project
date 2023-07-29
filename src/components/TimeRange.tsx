@@ -24,13 +24,14 @@ export const TimeRange: React.FC<{
         .fill(0)
         .reduce((a, _, i) => {
           if (i + 3 <= currentMonth) {
+            // TODO: Won't work when January comes in
             a.push({ id: i + 4, name: getMonthStr(i + 3) });
           }
           return a;
         }, []);
     else
       return Array(5)
-        .fill(new Date().getFullYear())
+        .fill(new Date().getFullYear() + (currentMonth > 2 ? 1 : 0))
         .map((y, i) => ({
           id: y + (i - 5),
           name: y + (i - 5) + "-" + (y + (i - 5) + 1),

@@ -17,8 +17,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     setLoading(true);
     getAllExpenses()
-      .then(({ months }) =>
-        dispatch({ type: Actions.MONTHLY_EXPENSES, payload: months })
+      .then((response) =>
+        dispatch({ type: Actions.MONTHLY_EXPENSES, payload: response })
       )
       .then(() => getUsers())
       .then((users) =>

@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { toast } from "react-hot-toast";
 import { Loader } from "..";
-import { updateExpenses } from "../../api";
+import { updateClosingBalances, updateExpenses } from "../../api";
 import { useCalculate, useUtility } from "../../hooks";
 import { Expenses } from "../../MetaData";
 import { Actions, TExpense } from "../../model";
@@ -19,29 +19,32 @@ export const DeleteExpense: React.FC<
   DialogProps & { onClose: () => void; month: string; exId: number }
 > = ({ open, onClose, exId, month }) => {
   const [loading, setLoading] = React.useState(false);
-  const [state, dispatch] = useStore();
+  const [, dispatch] = useStore();
   const { filter } = useUtility();
   const { monthlyData, calculateClosingBalance } = useCalculate();
   const deleteEx = () => {
     setLoading(true);
     const filteredExpenses: TExpense[] = filter(
-      state.months[month].expenses,
+      monthlyData[month]?.expenses,
       (e) => e.id !== exId
     );
     const result = {
-      opening_balance: monthlyData[month]?.opening_balance,
       expenses: filteredExpenses,
-      closing_balance: calculateClosingBalance(
-        filteredExpenses,
-        monthlyData[month]?.opening_balance
+      closing_balances: calculateClosingBalance(
+        -filter(monthlyData[month]?.expenses, (e) => e.id === exId)[0].amount,
+        +month
       ),
     };
     updateExpenses(month, result)
+      .then((_) => updateClosingBalances(result.closing_balances))
       .then(() => {
         toast.success(Expenses.delete_expense_success);
         dispatch({
           type: Actions.MONTHLY_EXPENSES,
-          payload: { [month]: result },
+          payload: {
+            months: { [month]: result },
+            closing_balances: result.closing_balances,
+          },
         });
       })
       .catch((err) => {

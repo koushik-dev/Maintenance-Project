@@ -3,7 +3,7 @@ export enum Errors {
   USER_NOT_FOUND = "Username or Password is incorrect.",
   PASSWORD_LENGTH = "Password should be at least 6 characters.",
 }
-
+export const SuperUser = "Admin";
 export const UsersCollectionName = "Users";
 export const ExpensesCollectionName = "expenses";
 export const AppBarTexts = {
@@ -51,12 +51,27 @@ export const BottomNavigationTexts = {
     {
       name: "Home",
       route: "/",
-      icon: "HomeOutlined",
+      icon: "Home",
+      forUser: true,
+      forAdmin: true,
     },
     {
       name: "Me",
       route: "/myself",
-      icon: "PersonOutlined",
+      icon: "Person",
+      forUser: true,
+    },
+    {
+      name: "Reports",
+      route: "/reports",
+      icon: "Assessment",
+      forAdmin: true,
+    },
+    {
+      name: "Expenses",
+      route: "/expenses",
+      icon: "RequestQuote",
+      forAdmin: true,
     },
   ],
 };

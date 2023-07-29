@@ -196,7 +196,7 @@ export const ExpenseTable: React.FC<{
                 <Typography variant="subtitle2" fontWeight={400}>
                   {ex.reason || ex.expense}
                 </Typography>
-                <Typography variant="subtitle2">
+                <Typography variant="overline" fontWeight={400}>
                   {getDateFromTimestamp(ex.date).toLocaleDateString()}
                 </Typography>
               </Stack>

@@ -13,6 +13,7 @@ import {
 } from "firebase/messaging";
 
 import { updateUser } from "../api";
+import { SuperUser } from "../MetaData";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB9GGwROTtLZSoCawjQa5VAQ2hOm0rClC0",
@@ -46,9 +47,10 @@ export const logIn = (username: string, password: string) =>
     `${username}@maintenance.com`,
     password
   ).then((userCredential) => {
-    updateUser(userCredential.user.uid, {
-      last_login: new Date().toLocaleString(),
-    }).then((_) => console.log(`${username} signed in.`));
+    if (username.toLocaleLowerCase() !== SuperUser.toLocaleLowerCase())
+      updateUser(userCredential.user.uid, {
+        last_login: new Date().toLocaleString(),
+      }).then((_) => console.log(`${username} signed in.`));
     return userCredential;
   });
 

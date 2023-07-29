@@ -24,7 +24,7 @@ const MonthlyBalanceSheet = () => {
   const printRef = React.useRef(null);
   const handlePrint = useReactToPrint({ content: () => printRef.current });
   const [state] = useStore();
-  const { calculateTotal, monthlyData } = useCalculate();
+  const { calculateTotal } = useCalculate();
   const { isPositive, getWordsFromNum, getMonthStr } = useUtility();
   const [{ total, debit, credit }, setTotal] = React.useState({
     credit: 0,
@@ -52,7 +52,12 @@ const MonthlyBalanceSheet = () => {
   }, [loading, activeMonth]);
   return (
     <>
-      <Stack direction={"row"} justifyContent="space-between" pt={3} pr={3}>
+      <Stack
+        direction={"row"}
+        justifyContent="space-between"
+        pt={matches ? 3 : 1}
+        px={matches ? 3 : 1}
+      >
         <Box>
           <Button variant="outlined" onClick={handlePrint}>
             <Print sx={{ mr: 1 }} />
@@ -106,7 +111,7 @@ const MonthlyBalanceSheet = () => {
             {loading ? (
               <Loader />
             ) : !state.months[activeMonth]?.expenses?.length ? (
-              <p>No Expenses!</p>
+              <p style={{ textAlign: "center" }}>No Expenses!</p>
             ) : (
               expensesData?.map((ex, index, arr) => (
                 <React.Fragment key={ex.id}>
@@ -152,14 +157,6 @@ const MonthlyBalanceSheet = () => {
           alignItems="center"
           justifyContent={"space-between"}
         >
-          <Box display={"flex"} alignItems="center" gap={1}>
-            <Typography variant="body2" textAlign={"right"}>
-              {MonthlyInvoice.amountInWords}
-            </Typography>
-            <Typography variant="body1" fontWeight={500} textAlign={"right"}>
-              {getWordsFromNum(total)}
-            </Typography>
-          </Box>
           <Stack
             direction={"row"}
             justifyContent="flex-end"
@@ -207,6 +204,18 @@ const MonthlyBalanceSheet = () => {
             </Box>
           </Stack>
         </Box>
+
+        <Box>
+          <Typography variant="body2">
+            {MonthlyInvoice.amountInWords}
+          </Typography>
+          <Typography variant="body2" fontWeight={400}>
+            <code>
+              {(total > 0 ? "" : "(Negative) ") +
+                getWordsFromNum(total > 0 ? total : total * -1)}
+            </code>
+          </Typography>
+        </Box>
         <Divider
           sx={{
             mb: 1,
@@ -214,37 +223,38 @@ const MonthlyBalanceSheet = () => {
             borderColor: (theme) => theme.palette.grey[200],
           }}
         />
-        <Stack direction={"row"} justifyContent="center" className="p-2 my-2">
-          <Box className="border border-solid border-l-4 border-l-blue-400 p-3 rounded">
-            <Stack
-              direction={"row"}
-              justifyContent="space-between"
-              alignItems={"center"}
-              gap={2}
-            >
-              <Typography variant="h6">Opening Balance: </Typography>
-              <Typography variant="h5" fontWeight={600} color="success.main">
-                {monthlyData[activeMonth]?.opening_balance}
-              </Typography>
-            </Stack>
-            <Stack
-              direction={"row"}
-              justifyContent="space-between"
-              alignItems={"center"}
-              gap={2}
-            >
-              <Typography variant="h6">Closing Balance: </Typography>
-              <Typography variant="h5" fontWeight={600} color="success.main">
-                {monthlyData[activeMonth]?.closing_balance}
-              </Typography>
-            </Stack>
-          </Box>
+        <Stack className="p-2 my-2">
+          <Stack
+            direction={"row"}
+            justifyContent="space-between"
+            alignItems={"center"}
+            gap={2}
+          >
+            <Typography variant="body1">Opening Balance: </Typography>
+            <Typography variant="h6" fontWeight={500} color="success.main">
+              {state.closing_balances[+activeMonth - 1] || 0}
+            </Typography>
+          </Stack>
+          <Stack
+            direction={"row"}
+            justifyContent="space-between"
+            alignItems={"center"}
+            gap={2}
+          >
+            <Typography variant="body1">Closing Balance: </Typography>
+            <Typography variant="h6" fontWeight={500} color="success.main">
+              {state.closing_balances[activeMonth] || 0}
+            </Typography>
+          </Stack>
         </Stack>
-        <Stack
-          direction={"row"}
-          justifyContent={"space-between"}
-          alignItems="center"
-        ></Stack>
+
+        <Divider
+          sx={{
+            mb: 1,
+            borderBottomWidth: 4,
+            borderColor: (theme) => theme.palette.grey[200],
+          }}
+        />
 
         {/* Signature */}
         <Stack direction={"row"} justifyContent="space-between">
