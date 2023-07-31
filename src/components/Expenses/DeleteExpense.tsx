@@ -28,10 +28,15 @@ export const DeleteExpense: React.FC<
       monthlyData[month]?.expenses,
       (e) => e.id !== exId
     );
+    const deletedExpense = filter(
+      monthlyData[month]?.expenses,
+      (e) => e.id === exId
+    )[0];
     const result = {
       expenses: filteredExpenses,
       closing_balances: calculateClosingBalance(
-        -filter(monthlyData[month]?.expenses, (e) => e.id === exId)[0].amount,
+        (deletedExpense.transaction === Expenses.credit ? -1 : 1) *
+          deletedExpense.amount,
         +month
       ),
     };

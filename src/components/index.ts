@@ -5,4 +5,5 @@ export { Layout } from "./Layout";
 export { Loader } from "./Loader";
 export { TimeRange } from "./TimeRange";
 export { MobileNavigation } from "./MobileNavigation";
+export { Defaulters } from "./Defaulters";
 export * from "./Users";

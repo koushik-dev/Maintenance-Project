@@ -14,8 +14,8 @@ import { useStore } from "../Providers";
 const Myself = () => {
   const matches = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
   const { getMonthStr } = useUtility();
-  const [state] = useStore();
   const navigate = useNavigate();
+  const [state] = useStore();
   return (
     <Stack p={matches ? 3 : 1} gap={2}>
       <Stack
@@ -28,13 +28,18 @@ const Myself = () => {
         </Typography>
         <Box className="flex justify-between">
           <Typography variant="h6">
-            {state.months[7]?.closing_balance}
+            {state.activeUser?.maintenance?.amount}
           </Typography>
           <Typography
             variant="h6"
-            sx={{ color: (theme) => theme.palette.error.main }}
+            sx={{
+              color: (theme) =>
+                state.activeUser?.maintenance?.status
+                  ? theme.palette.success.main
+                  : theme.palette.error.main,
+            }}
           >
-            Pending
+            {state.activeUser?.maintenance?.status ? "Paid" : "Pending"}
           </Typography>
         </Box>
       </Stack>

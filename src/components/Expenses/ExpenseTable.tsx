@@ -19,7 +19,7 @@ import React from "react";
 import { Loader } from "../Loader";
 import { AddExpense, DeleteExpense, EditExpense } from ".";
 import { Expenses as ExpensesMeta } from "../../MetaData";
-import { useCalculate, useUtility } from "../../hooks";
+import { useAuth, useCalculate, useUtility } from "../../hooks";
 import { Modal } from "..";
 import { TExpense } from "../../model";
 
@@ -29,6 +29,7 @@ export const ExpenseTable: React.FC<{
   addClose: () => void;
   activeMonth: string | number;
 }> = ({ search, addOpen, addClose, activeMonth }) => {
+  const { isAdmin } = useAuth();
   const matchesMD = useMediaQuery((theme: Theme) => theme.breakpoints.up("md"));
   const [editOpen, setEditOpen] = React.useState(false);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
@@ -81,11 +82,14 @@ export const ExpenseTable: React.FC<{
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                {ExpensesMeta.expense_table_titles.map((e) => (
-                  <TableCell key={e.key} align={e.align as any}>
-                    {e.value}
-                  </TableCell>
-                ))}
+                {ExpensesMeta.expense_table_titles.map(
+                  (e) =>
+                    (!e.isAdmin || isAdmin) && (
+                      <TableCell key={e.key} align={e.align as any}>
+                        {e.value}
+                      </TableCell>
+                    )
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -137,38 +141,44 @@ export const ExpenseTable: React.FC<{
                     <TableCell align="right">
                       {getDateFromTimestamp(ex.date).toLocaleDateString()}
                     </TableCell>
-                    <TableCell>
-                      <Stack direction={"row"} justifyContent="center" gap={1}>
-                        <Button
-                          variant="outlined"
-                          onClick={() => {
-                            setActiveExpense({
-                              id: ex.id,
-                              month: (
-                                getDateFromTimestamp(ex.date).getMonth() + 1
-                              ).toString(),
-                            });
-                            setEditOpen(true);
-                          }}
+                    {isAdmin && (
+                      <TableCell>
+                        <Stack
+                          direction={"row"}
+                          justifyContent="center"
+                          gap={1}
                         >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          onClick={() => {
-                            setActiveExpense({
-                              id: ex.id,
-                              month: (
-                                getDateFromTimestamp(ex.date).getMonth() + 1
-                              ).toString(),
-                            });
-                            setDeleteOpen(true);
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </Stack>
-                    </TableCell>
+                          <Button
+                            variant="outlined"
+                            onClick={() => {
+                              setActiveExpense({
+                                id: ex.id,
+                                month: (
+                                  getDateFromTimestamp(ex.date).getMonth() + 1
+                                ).toString(),
+                              });
+                              setEditOpen(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={() => {
+                              setActiveExpense({
+                                id: ex.id,
+                                month: (
+                                  getDateFromTimestamp(ex.date).getMonth() + 1
+                                ).toString(),
+                              });
+                              setDeleteOpen(true);
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </Stack>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))
               )}
@@ -232,14 +242,16 @@ export const ExpenseTable: React.FC<{
           month={activeExpense.month}
         />
       ) : null}
-      <DeleteExpense
-        open={deleteOpen}
-        onClose={deleteClose}
-        exId={activeExpense.id}
-        month={activeExpense.month}
-      />
+      {isAdmin && (
+        <DeleteExpense
+          open={deleteOpen}
+          onClose={deleteClose}
+          exId={activeExpense.id}
+          month={activeExpense.month}
+        />
+      )}
       {/* Mobile Actions Modal */}
-      {!matchesMD && (
+      {!matchesMD && isAdmin && (
         <Modal
           title="Actions"
           open={mobileActions}

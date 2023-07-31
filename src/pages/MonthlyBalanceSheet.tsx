@@ -232,7 +232,7 @@ const MonthlyBalanceSheet = () => {
           >
             <Typography variant="body1">Opening Balance: </Typography>
             <Typography variant="h6" fontWeight={500} color="success.main">
-              {state.closing_balances[+activeMonth - 1] || 0}
+              {state.closing_balances[getMonthStr(+activeMonth - 2)] || 0}
             </Typography>
           </Stack>
           <Stack
@@ -243,7 +243,7 @@ const MonthlyBalanceSheet = () => {
           >
             <Typography variant="body1">Closing Balance: </Typography>
             <Typography variant="h6" fontWeight={500} color="success.main">
-              {state.closing_balances[activeMonth] || 0}
+              {state.closing_balances[getMonthStr(+activeMonth - 1)] || 0}
             </Typography>
           </Stack>
         </Stack>

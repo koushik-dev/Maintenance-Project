@@ -1,7 +1,7 @@
 import {
   Box,
+  Button,
   Divider,
-  IconButton,
   Stack,
   Theme,
   Typography,
@@ -16,73 +16,102 @@ import { useStore } from "../Providers";
 import { useReactToPrint } from "react-to-print";
 import { Print } from "@mui/icons-material";
 import { useSearchParams } from "react-router-dom";
+import { TMonth } from "../model";
+const clubMonthlyExpenses = (
+  monthlyData: Record<string, TMonth>,
+  activeMonth: string | number
+) =>
+  monthlyData[activeMonth]?.expenses.reduce(
+    (acc, ex) => ({
+      ...acc,
+      [ex.expense]: {
+        ...acc[ex.expense],
+        amount:
+          (acc[ex.expense]?.amount || 0) +
+          (ex.transaction === Expenses.credit ? ex.amount : -ex.amount),
+        categories: [...(acc[ex.expense]?.categories || []), ex.reason].filter(
+          (v) => !!v
+        ),
+      },
+    }),
+    {} as Record<string, { amount: number; categories: string[] }>
+  );
 
+// TODO: handle year switch from the dropdown
 const YearlyBalanceSheet = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const matches = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
   const printRef = React.useRef(null);
   const handlePrint = useReactToPrint({ content: () => printRef.current });
   const [state] = useStore();
-  const { calculateTotal } = useCalculate();
+  const { monthlyData } = useCalculate();
   const { isPositive, getWordsFromNum } = useUtility();
-  const [{ total }, setTotal] = React.useState({
-    credit: 0,
-    debit: 0,
-    total: 0,
-  });
+  const [total, setTotal] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
-  const [activeMonth, setActiveMonth] = React.useState(
+  const [activeMonth] = React.useState(
     searchParams.get("month") || new Date().getMonth() + 1
+  );
+  const [activeyear, setActiveyear] = React.useState(
+    searchParams.get("year") || new Date().getFullYear()
   );
   const [expensesData, setExpensesData] = React.useState<
     Record<string, { amount: number; categories: string[] }>
   >({});
 
   React.useMemo(() => {
-    if (state.months[activeMonth]) {
+    const months = Object.keys(monthlyData);
+    if (months.length) {
       const clubExpenses = () =>
-        state.months[activeMonth]?.expenses.reduce(
-          (acc, ex) => ({
-            ...acc,
-            [ex.expense]: {
-              ...acc[ex.expense],
-              amount:
-                (acc[ex.expense]?.amount || 0) +
-                (ex.transaction === Expenses.credit ? ex.amount : -ex.amount),
-              categories: [
-                ...(acc[ex.expense]?.categories || []),
-                ex.reason,
-              ].filter((v) => !!v),
-            },
-          }),
-          {} as Record<string, { amount: number; categories: string[] }>
-        );
-      setExpensesData(clubExpenses());
+        months.reduce((result, month) => {
+          const monthlyExpenses = clubMonthlyExpenses(monthlyData, month);
+          Object.keys(monthlyExpenses).map(
+            (clubbedExpense) =>
+              (result[clubbedExpense] = {
+                amount:
+                  (result[clubbedExpense]?.amount || 0) +
+                  (monthlyExpenses[clubbedExpense]?.amount || 0),
+                categories: [
+                  ...(result[clubbedExpense]?.categories || []),
+                  ...monthlyExpenses[clubbedExpense]?.categories,
+                ],
+              })
+          );
+          return result;
+        }, {} as Record<string, { amount: number; categories: string[] }>);
+      const finalResult = clubExpenses();
+      setExpensesData(finalResult);
+      setTotal(
+        Object.values(finalResult).reduce((a, { amount }) => a + amount, 0)
+      );
     }
-  }, [state, activeMonth]);
+  }, [state]);
 
   React.useEffect(() => {
-    setLoading(!state.months[activeMonth]);
-  }, [state, activeMonth]);
-  React.useEffect(() => {
-    if (!loading) setTotal(calculateTotal(activeMonth));
-  }, [loading, activeMonth]);
+    setLoading(!monthlyData);
+  }, [state]);
   return (
     <>
-      <Stack direction={"row"} justifyContent="space-between" pt={3} pr={3}>
-        <Box></Box>
+      <Stack
+        direction={"row"}
+        justifyContent="space-between"
+        pt={matches ? 3 : 1}
+        px={matches ? 3 : 1}
+      >
+        <Box>
+          <Button variant="outlined" onClick={handlePrint}>
+            <Print sx={{ mr: 1 }} />
+            Print
+          </Button>
+        </Box>
         <Box display={"flex"} gap={2}>
           <TimeRange
-            value={activeMonth}
+            value={activeyear}
             onChange={(e) => {
-              setActiveMonth(+e.target.value);
+              setActiveyear(+e.target.value);
               setSearchParams({ year: e.target.value });
             }}
             duration="year"
           />
-          <IconButton onClick={handlePrint}>
-            <Print />
-          </IconButton>
         </Box>
       </Stack>
       <Stack p={matches ? 3 : 1} ref={printRef}>
@@ -105,6 +134,10 @@ const YearlyBalanceSheet = () => {
             <Divider variant="middle" />
             <Typography variant="overline">PAN Number: PSENC00000</Typography>
           </Stack>
+          <Typography variant="h6" textAlign={"center"}>
+            Balance Sheet for the financial year {activeyear} -{" "}
+            {+activeyear + 1}
+          </Typography>
         </Stack>
         <Divider
           sx={{
@@ -166,9 +199,11 @@ const YearlyBalanceSheet = () => {
             {total}
           </Typography>
         </Stack>
-        {MonthlyInvoice.amountInWords}
-        <Typography variant="body1" fontWeight={500}>
-          {getWordsFromNum(total)}
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          {MonthlyInvoice.amountInWords}
+        </Typography>
+        <Typography variant="body2" fontWeight={400}>
+          <code>{getWordsFromNum(total)}</code>
         </Typography>
         <Typography variant="h6" sx={{ mt: 2 }}>
           {MonthlyInvoice.note}

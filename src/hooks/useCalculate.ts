@@ -1,8 +1,10 @@
-import { Expenses } from "../MetaData";
+import { Expenses, FinancialMonths } from "../MetaData";
 import { useStore } from "../Providers";
+import { useUtility } from "./useUtility";
 
 export const useCalculate = () => {
   const [state] = useStore();
+  const { getMonthStr } = useUtility();
   const defaults = { credit: 0, debit: 0, total: 0 };
   const monthlyData = state.months;
   const calculateTotal = (month: number | string) =>
@@ -20,17 +22,27 @@ export const useCalculate = () => {
       }),
       defaults
     ) || defaults;
-  const calculateClosingBalance = (expense: number = 0, month: number = 0) =>
-    // TODO: will throw error if the months indexes are not prepopulated in db
-    Object.keys(state.closing_balances).reduce(
-      (cb, monthIndex) => ({
-        ...cb,
-        [monthIndex]:
-          state.closing_balances[monthIndex] +
-          (+monthIndex >= month ? expense : 0),
-      }),
-      {}
+  const calculateClosingBalance = (
+    expense: number = 0,
+    monthIndex: number = 0
+  ) => {
+    const changedMonthIndex = FinancialMonths.indexOf(
+      getMonthStr(+monthIndex - 1)
     );
+    return FinancialMonths.slice(
+      0,
+      new Date().getMonth() - 1 || undefined
+    ).reduce((cb, month, index) => {
+      const currentMonthIndex = FinancialMonths.indexOf(month);
+      return {
+        ...cb,
+        [month]:
+          (state.closing_balances[month] ??
+            state.closing_balances[FinancialMonths[index - 1]] ??
+            0) + (+currentMonthIndex >= changedMonthIndex ? expense : 0),
+      };
+    }, {});
+  };
   return {
     calculateTotal,
     monthlyData,

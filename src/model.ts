@@ -34,6 +34,7 @@ export type TExpense = {
   transaction: string;
 };
 export interface IUser {
+  docId: string;
   name: string;
   has_tenant: boolean;
   last_login: string;
@@ -55,6 +56,7 @@ export interface IUser {
       registration_number: string;
     }[];
   };
+  maintenance: { status: boolean; amount: number };
 }
 export type TMonth = {
   expenses: TExpense[];

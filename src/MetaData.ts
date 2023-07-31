@@ -6,10 +6,13 @@ export enum Errors {
 export const SuperUser = "Admin";
 export const UsersCollectionName = "Users";
 export const ExpensesCollectionName = "expenses";
+export const FinancialMonths = Array(12)
+  .fill(0)
+  .map((_, i) => new Date(1, i + 3).toLocaleString("en-US", { month: "long" }));
 export const AppBarTexts = {
   title: "Casagrand",
   logout: "Log Out",
-  admin: "Admin",
+  admin: SuperUser,
 };
 export const Details = {
   association: "Casagrand The Address Association",
@@ -135,7 +138,7 @@ export const Expenses = {
     { key: "credit", value: "Credit", align: "right" },
     { key: "debit", value: "Debit", align: "right" },
     { key: "date", value: "Date", align: "right" },
-    { key: "actions", value: "Actions", align: "center" },
+    { key: "actions", value: "Actions", align: "center", isAdmin: true },
   ],
   noData: "No Data",
 };
@@ -164,6 +167,7 @@ export const MyselfTexts = {
     {
       name: "Vehicles",
       route: "/receipt",
+      disabled: true,
     },
     {
       name: "Complaints",

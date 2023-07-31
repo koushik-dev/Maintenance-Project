@@ -26,7 +26,7 @@ const Expenses = () => {
   const matches = useMediaQuery((theme: Theme) => theme.breakpoints.up("sm"));
   const [search, setSearch] = React.useState("");
   const [addOpen, setAddOpen] = React.useState(false);
-  const { isPositive, capitalize } = useUtility();
+  const { isPositive, capitalize, getMonthStr } = useUtility();
   const { calculateTotal, monthlyData } = useCalculate();
   const { isAdmin } = useAuth();
   const { credit, debit, total } = calculateTotal(activeMonth);
@@ -77,7 +77,7 @@ const Expenses = () => {
             {capitalize(ExpensesMeta.openingBalance)}
           </Typography>
           <Typography variant="h6" color="success.main">
-            {state.closing_balances[+activeMonth - 1] || 0}
+            {state.closing_balances[getMonthStr(+activeMonth - 2)] || 0}
           </Typography>
         </Stack>
         {matches ? (
@@ -124,7 +124,7 @@ const Expenses = () => {
             {capitalize(ExpensesMeta.closingBalance)}
           </Typography>
           <Typography variant="h6" color="success.main" textAlign={"right"}>
-            {state.closing_balances[+activeMonth] || 0}
+            {state.closing_balances[getMonthStr(+activeMonth - 1)] || 0}
           </Typography>
         </Stack>
       </Box>

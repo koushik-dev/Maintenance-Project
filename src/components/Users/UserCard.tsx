@@ -1,4 +1,4 @@
-import { PhoneEnabled, EmojiTransportation, Phone } from "@mui/icons-material";
+import { Phone } from "@mui/icons-material";
 import {
   Stack,
   Badge,
@@ -11,20 +11,52 @@ import {
   Box,
 } from "@mui/material";
 import React, { useState } from "react";
-import { IUser } from "../../model";
+import { toast } from "react-hot-toast";
+import { updateUser } from "../../api";
+import { useAuth } from "../../hooks";
+import { Actions, IUser } from "../../model";
+import { useStore } from "../../Providers";
 
 export const UserCard: React.FC<IUser> = ({
   flat,
   name,
   contact_number,
-  vehicles,
   has_tenant,
   tenant,
+  docId,
+  maintenance: { status },
 }) => {
-  const [paid, setPaid] = useState(false);
+  const { user, isAdmin } = useAuth();
+  const [state, dispatch] = useStore();
+  const [loading, setLoading] = useState(false);
+  const togglePaymentStatus = () => {
+    setLoading(true);
+    updateUser(docId, { "maintenance.status": !status })
+      .then(() =>
+        dispatch({
+          type: Actions.SET_USER,
+          payload: {
+            users: state.users?.map((user) =>
+              user.docId === docId
+                ? {
+                    ...user,
+                    maintenance: { ...user.maintenance, status: !status },
+                  }
+                : user
+            ),
+            userId: isAdmin ? "" : user.uid,
+          },
+        })
+      )
+      .then((_) => {
+        toast.success("Payment status updated successfully.");
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
+  };
   return (
     <Card
-      className="flex flex-col justify-between"
+      className="flex flex-col justify-between border-l-8 border-l-blue-300"
       sx={{ backgroundColor: "rgb(243 244 246)", py: 1.5, px: 1 }}
     >
       <Stack
@@ -50,15 +82,21 @@ export const UserCard: React.FC<IUser> = ({
         </Stack>
 
         <Box className="text-right">
-          <IconButton size="large" color="primary">
+          <IconButton
+            size="large"
+            color="primary"
+            LinkComponent="a"
+            href={`tel:${has_tenant ? tenant.contact_number : contact_number}`}
+          >
             <Phone />
           </IconButton>
         </Box>
       </Stack>
-      <Stack py={1}>
+      {/* <Stack py={1}>
         <Typography variant="subtitle1">
           <PhoneEnabled /> {has_tenant ? tenant.contact_number : contact_number}
         </Typography>
+
         {(has_tenant ? tenant.vehicles : vehicles)?.map((v) => (
           <Typography variant="subtitle1" key={v.registration_number}>
             <EmojiTransportation /> {v.registration_number} / {v.type}
@@ -69,15 +107,18 @@ export const UserCard: React.FC<IUser> = ({
             <EmojiTransportation /> No Vehicles
           </Typography>
         )}
-      </Stack>
-      <ButtonGroup variant="contained" fullWidth>
-        <Button
-          onClick={() => setPaid((p) => !p)}
-          color={paid ? "success" : "error"}
-        >
-          {paid ? "Paid" : "Unpaid"}
-        </Button>
-      </ButtonGroup>
+      </Stack> */}
+      {isAdmin ? (
+        <ButtonGroup variant="contained" fullWidth>
+          <Button
+            onClick={togglePaymentStatus}
+            color={status ? "success" : "error"}
+            disabled={loading}
+          >
+            {status ? "Paid" : "Unpaid"}
+          </Button>
+        </ButtonGroup>
+      ) : null}
     </Card>
   );
 };

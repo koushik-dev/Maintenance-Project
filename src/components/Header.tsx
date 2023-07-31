@@ -78,7 +78,11 @@ export const Header = () => {
           >
             {matches ? isAdmin ? <AdminPanelSettings /> : <Person /> : null}
             <Typography variant="body2">
-              {isAdmin ? "Admin" : state.activeUser?.name}
+              {isAdmin
+                ? "Admin"
+                : state.activeUser.has_tenant
+                ? state.activeUser?.tenant?.name
+                : state.activeUser?.name}
             </Typography>
           </Button>
         </Toolbar>
