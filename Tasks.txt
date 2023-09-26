@@ -1,0 +1,36 @@
+// How to reset a user's password from admin's panel?
+// floating numbers in expenses not working
+// remove month/year query params when changed in dropdown
+
+SECURITY;
+// How to update PWA?
+// How to restore when data is lost?
+// What happens when an API fails or app crashes?
+
+// Miscellaneous - common purchase
+// common_maintenance - tank cleaning, sweeping, watchman salary, lift, common EB bill
+// sewage/water expense
+
+ISSUES;
+// Misc Reason not cleared when expense changed -       FIXED
+// Closing Balance shld autopopulate in all months - FIXED
+// opening balance not updated for current month when previous month expenses are updated - Fixed
+// Remove duplicates in yearly balance sheet categories
+
+FEATURES;
+// community posts
+// payment gateway
+// Share PDF
+// User's personal page to view paid status, get bills
+
+DONE;
+// Monthly balance sheet
+// Expense add, edit, delete and read.
+// Yearly balance sheet
+// Mobile display of reports for admin
+// defaulters for mobile
+// mobile display of myself
+// fixed closing balance issue when new month comes in
+// fixed yearly balance sheet to club all year expenses
+// Prevented admin actions to others
+// provided residents route to mobile view

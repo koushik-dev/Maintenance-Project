@@ -14,6 +14,7 @@ import {
   Button,
   Card,
   DialogContent,
+  Box,
 } from "@mui/material";
 import React from "react";
 import { Loader } from "../Loader";
@@ -231,6 +232,14 @@ export const ExpenseTable: React.FC<{
           )}
         </Stack>
       )}
+
+      <Box display={"flex"} justifyContent="space-between">
+        <Typography>Total Rows: {filteredExpenses?.length || 0}</Typography>
+        <Typography>
+          Total Amount:{" "}
+          {filteredExpenses?.reduce((a, e) => a + e.amount, 0) || 0}
+        </Typography>
+      </Box>
       {addOpen ? (
         <AddExpense open={addOpen} onClose={addClose} {...{ activeMonth }} />
       ) : null}

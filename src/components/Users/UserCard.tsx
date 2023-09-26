@@ -56,7 +56,7 @@ export const UserCard: React.FC<IUser> = ({
   };
   return (
     <Card
-      className="flex flex-col justify-between border-l-8 border-l-blue-300"
+      className="flex flex-col justify-between border-l-8 border-l-blue-300 gap-2"
       sx={{ backgroundColor: "rgb(243 244 246)", py: 1.5, px: 1 }}
     >
       <Stack
@@ -108,17 +108,19 @@ export const UserCard: React.FC<IUser> = ({
           </Typography>
         )}
       </Stack> */}
-      {isAdmin ? (
-        <ButtonGroup variant="contained" fullWidth>
+      <Stack direction={"row"} justifyContent="space-between">
+        <div></div>
+        {isAdmin ? (
           <Button
+            variant="contained"
             onClick={togglePaymentStatus}
             color={status ? "success" : "error"}
             disabled={loading}
           >
             {status ? "Paid" : "Unpaid"}
           </Button>
-        </ButtonGroup>
-      ) : null}
+        ) : null}
+      </Stack>
     </Card>
   );
 };

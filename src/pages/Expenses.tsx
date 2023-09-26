@@ -182,9 +182,6 @@ const Expenses = () => {
         onChange={(e) => setSearch(e.target.value)}
       />
       <ExpenseTable {...{ search, activeMonth, addOpen, addClose }} />
-      <Typography textAlign={"right"}>
-        Total: {monthlyData[activeMonth]?.expenses?.length || 0}
-      </Typography>
     </Stack>
   );
 };
