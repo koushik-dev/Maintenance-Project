@@ -1,11 +1,4 @@
-import {
-  Stack,
-  Typography,
-  Box,
-  Divider,
-  Theme,
-  useMediaQuery,
-} from "@mui/material";
+import { Stack, Typography, Box, Theme, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUtility } from "../hooks";
