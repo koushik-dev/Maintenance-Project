@@ -1,9 +1,13 @@
-import React, { useContext } from "react";
-import { AppContext } from "./Providers";
+import { Link } from "react-router-dom";
 
 const App = () => {
-  const [state] = useContext(AppContext);
-  return <div>App {state.user.loggedIn}</div>;
+  return (
+    <div>
+      App
+      <br />
+      <Link to="/">Home</Link>
+    </div>
+  );
 };
 
 export default App;
